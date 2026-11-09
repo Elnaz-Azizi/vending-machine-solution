@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * The <b>View</b> contract in MVC. A view only displays data and forwards user actions to the
  * {@link VendingController}; it never changes the model itself. Because the controller depends on
- * this interface, any view (for example a console or a graphical one) can be plugged in.
+ * this interface, the console view and the Swing view are interchangeable.
  */
 public interface VendingView {
 
@@ -22,7 +22,7 @@ public interface VendingView {
     /**
      * Starts the view and asks the controller for the initial data
      * ({@link VendingController#onShowProducts()}). The console view blocks here until the user
-     * exits; a window-based view may return immediately.
+     * exits; the Swing view returns immediately.
      */
     void start();
 

@@ -178,7 +178,7 @@ The application follows **Model – View – Controller**:
 | Part | Package | Responsibility |
 |------|---------|----------------|
 | **Model** | `se.lexicon.model` | Products, balance, stock and all business rules (`VendingMachine`, `VendingMachineImpl`, `Product`, ...) |
-| **View** | `se.lexicon.view` | Shows data and forwards user actions (`ConsoleView`). No business rules |
+| **View** | `se.lexicon.view` | Shows data and forwards user actions (`ConsoleView`, `SwingView`). No business rules |
 | **Controller** | `se.lexicon.controller` | Receives actions from the view, calls the model, tells the view what to show (`VendingController`) |
 
 `App` is the composition root: it creates the model and a view, then passes both to the controller.
@@ -223,6 +223,7 @@ classDiagram
         +showMessage(String, MessageType) void
     }
     class ConsoleView
+    class SwingView
     class VendingController {
         +start() void
         +onShowProducts() void
@@ -239,13 +240,26 @@ classDiagram
     VendingMachine <|.. VendingMachineImpl
     VendingMachineImpl "1" o-- "0..*" Product : stocks
     VendingView <|.. ConsoleView
+    VendingView <|.. SwingView
     VendingController --> VendingMachine : updates (Model)
     VendingController --> VendingView : shows (View)
     ConsoleView ..> VendingController : user actions
+    SwingView ..> VendingController : user actions
     VendingMachineImpl ..> VendingMachineException : throws
 ```
 
 `Product` is abstract because a plain product must not exist. `VendingMachine` and `VendingView` are interfaces, so the controller depends only on contracts: any model or view can be plugged in (and the controller is tested with a fake view).
+
+---
+
+## Screenshots (graphical UI)
+
+The Swing view (`SwingView`) is a dark-themed window with product cards on the left and the payment panel on the right. Buy and Return-change buttons are only enabled when they can be used. The images below are in `docs/screenshots/`.
+
+| | |
+|---|---|
+| **1. Start (balance 0 kr)**: every Buy button is disabled and says "Insert coin", Return change is disabled. ![Start](docs/screenshots/01-start.png) | **2. After inserting 10 + 5 kr**: the balance is 15 kr, Buy and Return change are enabled. ![Coins inserted](docs/screenshots/02-coins-inserted.png) |
+| **3. Buying Cola with too little money**: the machine's error message is shown and nothing changes. ![Insufficient balance](docs/screenshots/03-insufficient-balance.png) | **4. After buying Chips with 35 kr**: the product is dispensed, 20 kr change is returned, stock drops from 5 to 4. ![Purchase with change](docs/screenshots/04-purchase-with-change.png) |
 
 ---
 
@@ -255,7 +269,8 @@ Requires Java 25+ and Maven.
 
 ```bash
 mvn clean package          # compiles, runs the JUnit tests, builds target/vending_machine-1.0-SNAPSHOT.jar
-java -jar target/vending_machine-1.0-SNAPSHOT.jar   # starts the console UI
+java -jar target/vending_machine-1.0-SNAPSHOT.jar             # graphical UI (default)
+java -jar target/vending_machine-1.0-SNAPSHOT.jar --console   # console UI
 ```
 
 Run only the tests with `mvn test`.
@@ -266,7 +281,7 @@ Run only the tests with `mvn test`.
 
 The branches are stacked: each one adds a single commit on top of the previous one, so every step can be compared with a pull request or `git diff`.
 
-You are viewing the README of the `feature/mvc-architecture` branch.
+You are viewing the README of the `feature/swing-graphical-ui` branch.
 
 ```
 main  →  feature/mvc-architecture  →  feature/swing-graphical-ui
