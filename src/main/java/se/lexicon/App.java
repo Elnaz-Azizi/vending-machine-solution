@@ -1,28 +1,35 @@
 package se.lexicon;
 
-import se.lexicon.data.VendingMachineImpl;
+import se.lexicon.controller.VendingController;
 import se.lexicon.model.Beverage;
 import se.lexicon.model.Fruit;
 import se.lexicon.model.Snack;
-import se.lexicon.ui.ConsoleUI;
+import se.lexicon.model.VendingMachineImpl;
+import se.lexicon.view.ConsoleView;
+import se.lexicon.view.VendingView;
 
 /**
- * Application entry point (the Main-Class of the runnable JAR).
- * It only wires things together: it stocks the machine and hands it to the console UI.
+ * Application entry point (the Main-Class of the runnable JAR) and the MVC "composition root":
+ * it creates the Model, creates a View, creates the Controller that connects them, and starts it.
  */
 public class App {
 
     /**
-     * Creates a vending machine stocked with one product of each type and starts the console UI.
+     * Builds the model, view and controller and starts the application.
      *
      * @param args command line arguments (not used)
      */
     public static void main(String[] args) {
-        VendingMachineImpl machine = new VendingMachineImpl();
-        machine.addProduct(new Snack(1, "Chips", 15, 5, 130));
-        machine.addProduct(new Beverage(2, "Cola", 20, 3, 330));
-        machine.addProduct(new Fruit(3, "Apple", 10, 8, "Sweden"));
+        // Model: the machine and its products
+        VendingMachineImpl model = new VendingMachineImpl();
+        model.addProduct(new Snack(1, "Chips", 15, 5, 130));
+        model.addProduct(new Beverage(2, "Cola", 20, 3, 330));
+        model.addProduct(new Fruit(3, "Apple", 10, 8, "Sweden"));
 
-        new ConsoleUI(machine).run();
+        // View: the console view (implements VendingView)
+        VendingView view = new ConsoleView();
+
+        // Controller: connects model and view (dependency injection through the constructor)
+        new VendingController(model, view).start();
     }
 }
