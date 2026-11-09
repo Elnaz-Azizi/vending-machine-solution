@@ -120,7 +120,7 @@ Build the application based on your model. Your implementation must:
 
 Write JUnit tests for the vending machine logic. Test the business rules — not the console output.
 
-> Test `VendingMachineImpl` directly. Do not test `ConsoleUI`.
+> Test `VendingMachineImpl` directly. Do not test the console view.
 
 ### Test Case 1 — Insert Valid Coin
 **Given:** balance = 0
@@ -171,7 +171,17 @@ Write JUnit tests for the vending machine logic. Test the business rules — not
 
 ---
 
-## Class Diagram
+## Class Diagram (MVC)
+
+The application follows **Model – View – Controller**:
+
+| Part | Package | Responsibility |
+|------|---------|----------------|
+| **Model** | `se.lexicon.model` | Products, balance, stock and all business rules (`VendingMachine`, `VendingMachineImpl`, `Product`, ...) |
+| **View** | `se.lexicon.view` | Shows data and forwards user actions (`ConsoleView`). No business rules |
+| **Controller** | `se.lexicon.controller` | Receives actions from the view, calls the model, tells the view what to show (`VendingController`) |
+
+`App` is the composition root: it creates the model and a view, then passes both to the controller.
 
 ```mermaid
 classDiagram
@@ -204,7 +214,23 @@ classDiagram
         -int lastChange
         +addProduct(Product) void
     }
-    class ConsoleUI { +run() void }
+    class VendingView {
+        <<interface>>
+        +setController(VendingController) void
+        +start() void
+        +showProducts(List~Product~) void
+        +showBalance(int) void
+        +showMessage(String, MessageType) void
+    }
+    class ConsoleView
+    class VendingController {
+        +start() void
+        +onShowProducts() void
+        +onInsertCoin(int) void
+        +onSelectProduct(int) void
+        +onReturnChange() void
+        +onExit() void
+    }
     class VendingMachineException
 
     Product <|-- Snack
@@ -212,11 +238,14 @@ classDiagram
     Product <|-- Fruit
     VendingMachine <|.. VendingMachineImpl
     VendingMachineImpl "1" o-- "0..*" Product : stocks
-    ConsoleUI --> VendingMachine : uses
+    VendingView <|.. ConsoleView
+    VendingController --> VendingMachine : updates (Model)
+    VendingController --> VendingView : shows (View)
+    ConsoleView ..> VendingController : user actions
     VendingMachineImpl ..> VendingMachineException : throws
 ```
 
-`Product` is abstract because a plain product must not exist. `VendingMachine` is an interface so the UI depends only on the contract, not the implementation.
+`Product` is abstract because a plain product must not exist. `VendingMachine` and `VendingView` are interfaces, so the controller depends only on contracts: any model or view can be plugged in (and the controller is tested with a fake view).
 
 ---
 
@@ -226,7 +255,7 @@ Requires Java 25+ and Maven.
 
 ```bash
 mvn clean package          # compiles, runs the JUnit tests, builds target/vending_machine-1.0-SNAPSHOT.jar
-java -jar target/vending_machine-1.0-SNAPSHOT.jar
+java -jar target/vending_machine-1.0-SNAPSHOT.jar   # starts the console UI
 ```
 
 Run only the tests with `mvn test`.
@@ -237,7 +266,7 @@ Run only the tests with `mvn test`.
 
 The branches are stacked: each one adds a single commit on top of the previous one, so every step can be compared with a pull request or `git diff`.
 
-You are viewing the README of the `main` branch.
+You are viewing the README of the `feature/mvc-architecture` branch.
 
 ```
 main  →  feature/mvc-architecture  →  feature/swing-graphical-ui
