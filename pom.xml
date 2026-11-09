@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    Maven build file for the Lexicon Vending Machine workshop.
+
+    Common commands:
+      mvn clean package   -> compile, run all JUnit tests, build target/vending_machine-1.0-SNAPSHOT.jar
+      mvn test            -> compile and run the JUnit tests only
+      java -jar target/vending-machine-1.0-SNAPSHOT.jar   -> start the console application
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>se.lexicon</groupId>
+    <artifactId>vending-machine</artifactId>
+    <version>1.0-SNAPSHOT</version>
+
+    <properties>
+        <maven.compiler.source>26</maven.compiler.source>
+        <maven.compiler.target>26</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <dependencies>
+        <!--
+            JUnit 6 (Jupiter): the test framework. The aggregate "junit-jupiter" artifact bundles
+            the API (@Test, assertions), the engine that runs the tests, and parameterized-test support.
+            Scope "test" = only on the test classpath, so it is NOT packaged into the runnable JAR.
+        -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>6.0.0</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!--
+                Surefire runs the tests during the "test" phase. A version that supports JUnit 6
+                is pinned so tests are discovered and executed (older versions skip them).
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.5.4</version>
+            </plugin>
+
+            <!--
+                Jar plugin builds the JAR. The manifest's Main-Class tells the JVM which class holds
+                main(), which is what makes "java -jar" work without naming a class on the command line.
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>se.lexicon.App</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
